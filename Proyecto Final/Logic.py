@@ -1,27 +1,34 @@
 class Sentence():
 
     def evaluate(self, model):
-        """Evaluates the logical sentence."""
+        """Evalúa la sentencia lógica."""
+
         raise Exception("nothing to evaluate")
 
     def formula(self):
-        """Returns string formula representing logical sentence."""
+        """Devuelve una cadena de la formula que representa una sentencia lógica."""
+
         return ""
 
     def symbols(self):
-        """Returns a set of all symbols in the logical sentence."""
+        """Devuelve un conjunto de todos los símbolos de la sentencia lógica."""
+
         return set()
 
     @classmethod
     def validate(cls, sentence):
+        """Valida que la sentencia sea una instancia de la clase Sentence"""
+
         if not isinstance(sentence, Sentence):
-            raise TypeError("must be a logical sentence")
+            raise TypeError("Debe ser una secuencia lógica")
 
     @classmethod
     def parenthesize(cls, s):
-        """Parenthesizes an expression if not already parenthesized."""
+        """Pone entre paréntesis una expresión si no está ya entre paréntesis."""
+
         def balanced(s):
-            """Checks if a string has balanced parentheses."""
+            """Comprueba si una cadena tiene paréntesis equilibrados."""
+
             count = 0
             for c in s:
                 if c == "(":
@@ -57,7 +64,7 @@ class Symbol(Sentence):
         try:
             return bool(model[self.name])
         except KeyError:
-            raise EvaluationException(f"variable {self.name} not in model")
+            raise EvaluationException(f"variable {self.name} no se encuentra en el modelo")
 
     def formula(self):
         return self.name
@@ -67,6 +74,8 @@ class Symbol(Sentence):
 
 
 class Not(Sentence):
+    """Operador NOT"""
+
     def __init__(self, operand):
         Sentence.validate(operand)
         self.operand = operand
@@ -91,6 +100,8 @@ class Not(Sentence):
 
 
 class And(Sentence):
+    """Operador AND"""
+
     def __init__(self, *conjuncts):
         for conjunct in conjuncts:
             Sentence.validate(conjunct)
@@ -128,6 +139,8 @@ class And(Sentence):
 
 
 class Or(Sentence):
+    """Operador OR"""
+
     def __init__(self, *disjuncts):
         for disjunct in disjuncts:
             Sentence.validate(disjunct)
@@ -159,6 +172,8 @@ class Or(Sentence):
 
 
 class Implication(Sentence):
+    """Operador IMPLICACIÓN"""
+
     def __init__(self, antecedent, consequent):
         Sentence.validate(antecedent)
         Sentence.validate(consequent)
@@ -190,6 +205,8 @@ class Implication(Sentence):
 
 
 class Biconditional(Sentence):
+    """Operador BICONDICIONAL"""
+
     def __init__(self, left, right):
         Sentence.validate(left)
         Sentence.validate(right)
@@ -223,38 +240,38 @@ class Biconditional(Sentence):
 
 
 def model_check(knowledge, query):
-    """Checks if knowledge base entails query."""
+    """Comprueba si la base de conocimientos implica una consulta."""
 
     def check_all(knowledge, query, symbols, model):
-        """Checks if knowledge base entails query, given a particular model."""
+        """Comprueba si la base de conocimientos implica una consulta, dado un modelo concreto."""
 
-        # If model has an assignment for each symbol
+        # Si el modelo tiene una asignación para cada símbolo
         if not symbols:
 
-            # If knowledge base is true in model, then query must also be true
+            # Si la base de conocimientos es verdadera en el modelo, la consulta también debe serlo.
             if knowledge.evaluate(model):
                 return query.evaluate(model)
             return True
         else:
 
-            # Choose one of the remaining unused symbols
+            # Elija uno de los símbolos restantes no utilizados
             remaining = symbols.copy()
             p = remaining.pop()
 
-            # Create a model where the symbol is true
+            # Crear un modelo en el que el símbolo sea verdadero
             model_true = model.copy()
             model_true[p] = True
 
-            # Create a model where the symbol is false
+            # Crear un modelo en el que el símbolo sea falso
             model_false = model.copy()
             model_false[p] = False
 
-            # Ensure entailment holds in both models
+            # Garantizar que la vinculación se cumple en ambos modelos
             return (check_all(knowledge, query, remaining, model_true) and
                     check_all(knowledge, query, remaining, model_false))
 
-    # Get all symbols in both knowledge and query
+    # Obtener todos los símbolos tanto en el conocimiento como en la consulta
     symbols = set.union(knowledge.symbols(), query.symbols())
 
-    # Check that knowledge entails query
+    # Comprobar que el conocimiento implica consulta
     return check_all(knowledge, query, symbols, dict())
