@@ -21,6 +21,8 @@ y este proyecto se adhiere a [Versionamiento Semantico](https://semver.org/spec/
 - Agregar elementos visuales a la historia.
 - Agregar interacción del usuario.
 - Eliminar la necesidad de cargar los archivos cada vez que se inicie el proyecto.
+- **Retroalimentación:** Colocar las tablas de probabilidades de manera aleatoria y que así vaya aprendiendo.
+- Terminar de traducir los comentarios.
 
 ## [1.1.0] - 2023-03-05
 
