@@ -1,5 +1,6 @@
 from pomegranate import *
 
+# Antecedentes de las personas
 
 Antecedentes = Node(DiscreteDistribution({
     "Ratero": 0.06,
@@ -7,8 +8,8 @@ Antecedentes = Node(DiscreteDistribution({
     "Neutro": 0.939
 }), name="Antecedentes")
 
-
 # Relación con el muerto
+
 Relacion = Node(DiscreteDistribution({
     "Madre": 0.08,	
     "Padre": 0.08,	 
@@ -21,6 +22,7 @@ Relacion = Node(DiscreteDistribution({
     "Ninguna": 0.24
 }), name="Relacion")
 
+# ¿Ha consumido algo antes?
 
 Consumo = Node(DiscreteDistribution({
     "Alcohol": 0.04,	
@@ -29,7 +31,7 @@ Consumo = Node(DiscreteDistribution({
 }), name="Consumo")
 
 
-# Benecios obtenidos del muerto, ya sea gracias a su muerte o en vida
+# Beneficios obtenidos del muerto, ya sea gracias a su muerte o en vida
 
 Beneficios = Node(ConditionalProbabilityTable([
     ["Madre","Sostenimiento",0.2],
@@ -79,7 +81,7 @@ Beneficios = Node(ConditionalProbabilityTable([
 
 ],[Relacion.distribution]), name="Beneficios")
 
-#Emociones hacia el muerto
+# Emociones hacia el muerto
 
 Emociones = Node(ConditionalProbabilityTable([
     ["Madre","Odio",0.1],
@@ -129,7 +131,7 @@ Emociones = Node(ConditionalProbabilityTable([
 
 ],[Relacion.distribution]), name="Emociones")
 
-# Tiene motivos para matarlo?
+# ¿Tiene motivos para matarlo?
 
 Motivo = Node(ConditionalProbabilityTable([
     ["Ratero"  ,"Odio"  ,  "Sostenimiento", "Si",0.5175],
@@ -235,6 +237,8 @@ Motivo = Node(ConditionalProbabilityTable([
 
 ],[Antecedentes.distribution, Emociones.distribution, Beneficios.distribution]), name="Motivo")
 
+# ¿Culpable o inocente?
+
 Asesino = Node(ConditionalProbabilityTable([
 
     ["Si" ,	"Alcohol", "Culpable", 0.9],
@@ -252,13 +256,13 @@ Asesino = Node(ConditionalProbabilityTable([
 
 ],[Motivo.distribution, Consumo.distribution]), name="Asesino")
 
-
 # Creamos una Red Bayesiana y añadimos estados
+
 modelo = BayesianNetwork()
-#modelo.add_states(Antecedentes, Relacion, Consumo, Beneficios, Emociones, Motivo, Asesino)
 modelo.add_states(Antecedentes, Relacion, Consumo, Beneficios,Emociones, Motivo, Asesino)
 
 # Añadimos bordes que conecten nodos
+
 modelo.add_edge(Relacion, Emociones)
 modelo.add_edge(Relacion, Beneficios)
 modelo.add_edge(Antecedentes, Motivo)
@@ -267,5 +271,6 @@ modelo.add_edge(Beneficios, Motivo)
 modelo.add_edge(Motivo, Asesino)
 modelo.add_edge(Consumo, Asesino)
 
-#Modelo Final
+# Modelo Final
+
 modelo.bake()
